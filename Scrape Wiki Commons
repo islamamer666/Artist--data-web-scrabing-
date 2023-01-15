@@ -1,0 +1,31 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import pandas as pd
+wga7 = pd.read_excel('wga7.xlsx')
+wga7['keywords'] = wga7['title'] + wga7['artistDisplayName'] 
+keywords = wga7['keywords']
+for keyword in keywords:
+    try:
+        browser = webdriver.Chrome(executable_path=r"C:\chromedriver.exe")
+        browser.get("https://commons.wikimedia.org/wiki/Main_Page")
+        browser.maximize_window()
+        search_input = browser.find_element(By.ID, "searchInput")
+        browser.implicitly_wait(10)
+        search_input.send_keys(keyword)
+        search_input.submit()
+        browser.implicitly_wait(10)
+        search_result = browser.find_element(By.CLASS_NAME, "sdms-image-result")
+        search_result.click()
+        browser.implicitly_wait(10)
+        original_image = browser.find_element(By.CLASS_NAME, "internal")
+        link = original_image.get_attribute("href")
+        print(link)
+        browser.quit()
+    except:
+        browser.quit()
+        txt = "failed to scrape {image}".format(image = keyword)
+        print(txt)
+        
